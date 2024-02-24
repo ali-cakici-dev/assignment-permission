@@ -1,13 +1,16 @@
 package permission
 
-import "context"
+import (
+	"context"
+	"math/rand"
+)
 
 type document interface {
 	fetch(context.Context, string) error
 }
 
 type role struct {
-	ID          string   `bson:"_id"`
+	ID          string   `bson:"_id"` // mongodb ObjectID
 	Name        string   `bson:"name"`
 	Description string   `bson:"description"`
 	Action      []string `bson:"action"`
@@ -29,15 +32,23 @@ func (r *permission) fetch(ctx context.Context, id string) (err error) {
 	return
 }
 
+type userID string
+type userIDs []userID
+
+func (u *userID) generate() (id userID) {
+	// generate user id randomly
+	return userID(rune(rand.Int()))
+}
+
 type userPermission struct {
-	UserID string `bson:"user_id"`
+	UserID userID `bson:"user_id"`
 	Role   string `bson:"role"`
 }
 
 type groupPermission struct {
-	GroupID string   `bson:"group_id"`
-	Role    string   `bson:"role"`
-	Members []string `bson:"member_ids"`
+	GroupID string  `bson:"group_id"`
+	RoleID  string  `bson:"role_id"`
+	Members userIDs `bson:"member_ids"`
 }
 
 func fetchPermittedResources(ctx context.Context, userID string) (resources []string, err error) {
