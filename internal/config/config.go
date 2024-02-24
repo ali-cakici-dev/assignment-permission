@@ -9,6 +9,7 @@ import (
 type Config struct {
 	DatabaseURI string `env:"DATABASE_URI" envDefault:"mongodb://localhost:27017"`
 	Port        int    `env:"PORT" envDefault:"8080"`
+	Host        string `env:"HOST" envDefault:"localhost"`
 }
 
 func LoadConfig(path, filename string) (*Config, error) {

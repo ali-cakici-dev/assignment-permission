@@ -1,12 +1,15 @@
 package main
 
 import (
+	server "assignment-permission/cmd/server"
 	api2 "assignment-permission/internal/api"
 	"assignment-permission/internal/config"
 	"assignment-permission/internal/permission"
 	mongo "assignment-permission/internal/pkg"
 	"context"
 )
+
+var exitErr error
 
 func main() {
 	ctx := context.Background()
@@ -33,6 +36,15 @@ func main() {
 	// init api to be used by the http server
 	api := api2.New(*service)
 
+	httpServer := server.New(&server.Config{
+		Host: cfg.Host,
+		Port: cfg.Port,
+	}, api)
+
+	fatalErr := make(chan error, 1)
+	startServices(fatalErr, httpServer)
+
+	exitErr = <-fatalErr
 }
 
 func initMongoClient(ctx context.Context, cfg mongo.Config) (mi *mongo.MongoInstance, err error) {
@@ -50,4 +62,10 @@ func initService(ctx context.Context, mi *mongo.MongoInstance, cfg permission.Mo
 		return nil
 	}
 	return &newService
+}
+
+func startServices(fatalErr chan error, httpServer *server.HTTP) {
+	go func() {
+		fatalErr <- httpServer.Start()
+	}()
 }

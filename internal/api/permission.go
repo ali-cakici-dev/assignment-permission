@@ -5,7 +5,7 @@ import (
 )
 
 func (ap *API) InsertPermission(ctx context.Context) error {
-	err := ap.pService.InsertPermission(ctx)
+	err := ap.pService.InsertRole(ctx)
 	if err != nil {
 		return err
 	}
