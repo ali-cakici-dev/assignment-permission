@@ -74,6 +74,55 @@ func (db *PermissionDB) getPermissionByUserID(ctx context.Context, userID string
 	return result, nil
 }
 
+func (db *PermissionDB) getRoleIDByUserIDGroupID(ctx context.Context, userID string, groupID string) (string, error) {
+	permissionsCollection := db.cli.DB.Collection(db.cfg.PermissionCollection)
+	res := permissionsCollection.FindOne(
+		ctx,
+		bson.M{
+			"$and": bson.A{
+				bson.M{userID: bson.M{"$in": "group.members"}},
+				bson.M{"groups.group_id": groupID},
+			},
+		},
+	)
+	if res.Err() != nil {
+		return "", res.Err()
+	}
+
+	var p permission
+	err := res.Decode(&p)
+	if err != nil {
+		return "", err
+	}
+
+	for _, v := range p.Groups {
+		if v.GroupID == groupID {
+			return v.RoleID, nil
+		}
+	}
+
+	return "", nil
+}
+
+func (db *PermissionDB) getRoleByID(ctx context.Context, roleID string) (*role, error) {
+	rolesCollection := db.cli.DB.Collection(db.cfg.PermissionCollection)
+	res := rolesCollection.FindOne(
+		ctx,
+		bson.M{"_id": roleID},
+	)
+	if res.Err() != nil {
+		return nil, res.Err()
+	}
+
+	var r role
+	err := res.Decode(&r)
+	if err != nil {
+		return nil, err
+	}
+
+	return &r, nil
+}
+
 func InitDB(cli *pkg.MongoInstance, cfg *MongoConfig) (*PermissionDB, error) {
 
 	return &PermissionDB{

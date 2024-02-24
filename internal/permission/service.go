@@ -14,6 +14,8 @@ type rolePersistence interface {
 	InsertPermission(ctx context.Context, prd *permission) error
 	getAllPermissions(ctx context.Context) (permissions, error)
 	getPermissionByUserID(ctx context.Context, userID string) (permissions, error)
+	getRoleIDByUserIDGroupID(ctx context.Context, userID string, groupID string) (string, error)
+	getRoleByID(ctx context.Context, roleID string) (*role, error)
 }
 
 type service struct {
@@ -25,6 +27,7 @@ type Service interface {
 	InsertPermission(ctx context.Context, p *permission) error
 	GetAllPermissions(ctx context.Context) (models.Permissions, error)
 	FetchPermittedResources(ctx context.Context, userID string) (models.Permissions, error)
+	GetRole(ctx context.Context, userID string, groupID string) (*models.Role, error)
 }
 
 func (svc *service) InsertRole(ctx context.Context) error {
@@ -65,6 +68,23 @@ func (svc *service) FetchPermittedResources(ctx context.Context, userID string) 
 	return domain, nil
 }
 
+func (svc *service) GetRole(ctx context.Context, userID string, groupID string) (*models.Role, error) {
+	roleID, err := svc.store.getRoleIDByUserIDGroupID(ctx, userID, groupID)
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := svc.store.getRoleByID(ctx, roleID)
+	if err != nil {
+		return nil, err
+	}
+
+	domain, err := r.Domain()
+	if err != nil {
+		return nil, err
+	}
+	return domain, nil
+}
 func NewService(str persistence) (Service, error) {
 	return &service{
 		store: str,

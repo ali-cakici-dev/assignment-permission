@@ -6,7 +6,7 @@ import (
 )
 
 type role struct {
-	ID          string   `bson:"_id"` // mongodb ObjectIDd
+	ID          string   `bson:"_id"`
 	Name        string   `bson:"name"`
 	Description string   `bson:"description"`
 	Action      []string `bson:"action"`
@@ -120,6 +120,15 @@ func (u *userIDs) Domain() models.UserIDs {
 		users = append(users, models.UserID(v))
 	}
 	return users
+}
+
+func (r *role) Domain() (*models.Role, error) {
+	return &models.Role{
+		ID:          r.ID,
+		Name:        r.Name,
+		Description: r.Description,
+		Action:      r.Action,
+	}, nil
 }
 
 func ToPermission(p *models.Permission) (*permission, error) {

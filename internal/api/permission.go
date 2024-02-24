@@ -38,6 +38,15 @@ func (ap *API) FetchPermittedResources(ctx context.Context, userID string) (mode
 	return ps, nil
 }
 
+func (ap *API) GetRole(ctx context.Context, userID string, groupID string) (*models.Role, error) {
+	ps, err := ap.pService.GetRole(ctx, userID, groupID)
+	if err != nil {
+		return nil, err
+	}
+
+	return ps, nil
+}
+
 func (ap *API) InsertRole(ctx context.Context) error {
 	err := ap.pService.InsertRole(ctx)
 	if err != nil {

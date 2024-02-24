@@ -53,6 +53,21 @@ func (ht *HTTP) FetchPermittedResources(w http.ResponseWriter, r *http.Request) 
 	_ = json.NewEncoder(w).Encode(permissions)
 }
 
+func (ht *HTTP) GetRole(w http.ResponseWriter, r *http.Request) {
+	userID := chi.URLParam(r, "user_id")
+	groupID := chi.URLParam(r, "group_id")
+	permissions, err := ht.api.GetRole(r.Context(), userID, groupID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if permissions == nil {
+		http.Error(w, "No permissions found for the user", http.StatusNotFound)
+		return
+	}
+	_ = json.NewEncoder(w).Encode(permissions)
+}
+
 func (ht *HTTP) CreatePermission(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -99,6 +114,7 @@ func New(cfg *Config, api *api.API) *HTTP {
 	router.Get("/all-permissions", ht.GetPermissions)
 	router.Post("/permissions", ht.CreatePermission)
 	router.Get("/fetch-permitted-resources/{user_id}", ht.FetchPermittedResources)
+	router.Get("/get-role/{group_id}/{user_id}", ht.GetRole)
 
 	return ht
 }

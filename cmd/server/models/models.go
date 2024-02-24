@@ -3,6 +3,7 @@ package models
 import "errors"
 
 type Role struct {
+	ID          string   `json:"id"`
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
 	Action      []string `json:"action"`
