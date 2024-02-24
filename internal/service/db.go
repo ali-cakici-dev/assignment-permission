@@ -1,6 +1,8 @@
-package main
+package service
 
-import "context"
+import (
+	"context"
+)
 
 func initDB(ctx context.Context) (err error) {
 
