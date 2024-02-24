@@ -29,6 +29,15 @@ func (ap *API) GetAllPermissions(ctx context.Context) (models.Permissions, error
 	return ps, nil
 }
 
+func (ap *API) FetchPermittedResources(ctx context.Context, userID string) (models.Permissions, error) {
+	ps, err := ap.pService.FetchPermittedResources(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return ps, nil
+}
+
 func (ap *API) InsertRole(ctx context.Context) error {
 	err := ap.pService.InsertRole(ctx)
 	if err != nil {

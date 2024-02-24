@@ -51,6 +51,29 @@ func (db *PermissionDB) getAllPermissions(ctx context.Context) (permissions, err
 	return result, nil
 }
 
+func (db *PermissionDB) getPermissionByUserID(ctx context.Context, userID string) (permissions, error) {
+	permissionCollection := db.cli.DB.Collection(db.cfg.PermissionCollection)
+	find, err := permissionCollection.Find(
+		ctx,
+		bson.M{"users.user_id": userID},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]permission, 0)
+	for find.Next(ctx) {
+		var p permission
+		err := find.Decode(&p)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, p)
+	}
+
+	return result, nil
+}
+
 func InitDB(cli *pkg.MongoInstance, cfg *MongoConfig) (*PermissionDB, error) {
 
 	return &PermissionDB{

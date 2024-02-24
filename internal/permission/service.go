@@ -13,6 +13,7 @@ type rolePersistence interface {
 	InsertRole(ctx context.Context, prd *role) error
 	InsertPermission(ctx context.Context, prd *permission) error
 	getAllPermissions(ctx context.Context) (permissions, error)
+	getPermissionByUserID(ctx context.Context, userID string) (permissions, error)
 }
 
 type service struct {
@@ -23,6 +24,7 @@ type Service interface {
 	InsertRole(ctx context.Context) error
 	InsertPermission(ctx context.Context, p *permission) error
 	GetAllPermissions(ctx context.Context) (models.Permissions, error)
+	FetchPermittedResources(ctx context.Context, userID string) (models.Permissions, error)
 }
 
 func (svc *service) InsertRole(ctx context.Context) error {
@@ -47,6 +49,19 @@ func (svc *service) GetAllPermissions(ctx context.Context) (models.Permissions, 
 		return nil, err
 	}
 
+	return domain, nil
+}
+
+func (svc *service) FetchPermittedResources(ctx context.Context, userID string) (models.Permissions, error) {
+	prms, err := svc.store.getPermissionByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+
+	}
+	domain, err := prms.Domain()
+	if err != nil {
+		return nil, err
+	}
 	return domain, nil
 }
 
