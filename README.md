@@ -1,3 +1,6 @@
+<details>
+  <summary>Assignment</summary>
+
 ## Acceptance criteria
 
 The objective of this project is to develop a permission management system that connects to a mongoDB database, retrieves permitted resources for a user, determines the user's role for a specific resource, and checks whether the user has permission to perform a particular action on that resource.
@@ -12,7 +15,7 @@ In this task, you are required to fill in the empty functions with appropriate n
 
 "initDB": This function is responsible for establishing a connection to the database system. It should configure the necessary parameters and handle any errors that occur during the connection process.
 
-"fetchDocument": This function is responsible for fetching a specific document from the database. 
+"fetchDocument": This function is responsible for fetching a specific document from the database.
 
 "fetchPermittedResources": Implement this function to retrieve permitted resources for a given user from the database. It should query the database based on the user's credentials and return a list of resources that the user is allowed to access.
 
@@ -59,3 +62,4 @@ In this task, you are required to fill in the empty functions with appropriate n
 ```
 
 NOTE: In the event of a permission conflict, precedence shall be given to the higher permission level for resolution.
+</details>
