@@ -26,7 +26,7 @@ func InitDB(cli *pkg.MongoInstance, cfg *MongoConfig) (*PermissionDB, error) {
 	}, nil
 }
 
-func fetchDocument(res *document, collection string) (err error) {
-
-	return
-}
+//func fetchDocument(res *document, collection string) (err error) {
+//
+//	return
+//}

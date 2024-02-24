@@ -5,20 +5,11 @@ import (
 	"math/rand"
 )
 
-type document interface {
-	fetch(context.Context, string) error
-}
-
 type role struct {
-	ID          string   `bson:"_id"` // mongodb ObjectID
+	ID          string   `bson:"_id"` // mongodb ObjectIDd
 	Name        string   `bson:"name"`
 	Description string   `bson:"description"`
 	Action      []string `bson:"action"`
-}
-
-func (r *role) fetch(ctx context.Context, id string) (err error) {
-
-	return
 }
 
 type permission struct {
