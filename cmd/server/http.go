@@ -1,6 +1,7 @@
 package server
 
 import (
+	"assignment-permission/cmd/server/models"
 	"assignment-permission/internal/api"
 	"encoding/json"
 	"errors"
@@ -30,13 +31,41 @@ func (ht *HTTP) Start() error {
 }
 
 func (ht *HTTP) GetPermissions(w http.ResponseWriter, r *http.Request) {
-	//permissions, err := ht.api.GetPermissions()
-	permissions := []string{"read", "write", "delete"}
-	//if err != nil {
-	//	http.Error(w, err.Error(), http.StatusInternalServerError)
-	//	return
-	//}
+	permissions, err := ht.api.GetAllPermissions(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	_ = json.NewEncoder(w).Encode(permissions)
+}
+
+func (ht *HTTP) CreatePermission(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var newPermission models.Permission
+	err := decoder.Decode(&newPermission)
+	if err != nil {
+		http.Error(w, "Error decoding permission data", http.StatusBadRequest)
+		return
+	}
+	err = newPermission.Validate()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = ht.api.InsertPermission(r.Context(), newPermission)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	_, _ = w.Write([]byte("Permission created successfully"))
 }
 
 func New(cfg *Config, api *api.API) *HTTP {
@@ -53,7 +82,8 @@ func New(cfg *Config, api *api.API) *HTTP {
 	router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte("OK"))
 	})
-	router.Get("/permissions", ht.GetPermissions)
+	router.Get("/all-permissions", ht.GetPermissions)
+	router.Post("/permissions", ht.CreatePermission)
 
 	return ht
 }
