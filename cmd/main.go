@@ -1,7 +1,9 @@
 package main
 
 import (
+	api2 "assignment-permission/internal/api"
 	"assignment-permission/internal/config"
+	"assignment-permission/internal/permission"
 	mongo "assignment-permission/internal/pkg"
 	"context"
 )
@@ -12,17 +14,24 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	// init mongo client to be used by the service
 	mongoCfg := mongo.Config{
 		ConnectionURI: cfg.DatabaseURI,
 		DatabaseName:  "assignment-permission",
 	}
-
 	mi, err := initMongoClient(ctx, mongoCfg)
 	if err != nil {
 		panic(err)
 	}
 
-	service := initService(ctx, mi)
+	// init service to be used by the api
+	service := initService(ctx, mi, permission.MongoConfig{
+		PermissionCollection: "permissions",
+	})
+
+	// init api to be used by the http server
+	api := api2.New(*service)
 
 }
 
@@ -31,9 +40,14 @@ func initMongoClient(ctx context.Context, cfg mongo.Config) (mi *mongo.MongoInst
 	return mi, err
 }
 
-func initService(ctx context.Context, mi *mongo.MongoInstance) (service *assignment_permission.Service) {
-	service = &assignment_permission.Service{
-		Mongo: mi,
+func initService(ctx context.Context, mi *mongo.MongoInstance, cfg permission.MongoConfig) (service *permission.Service) {
+	persistence, err := permission.InitDB(mi, &cfg)
+	if err != nil {
+		panic(err)
 	}
-	return service
+	newService, err := permission.NewService(persistence)
+	if err != nil {
+		return nil
+	}
+	return &newService
 }

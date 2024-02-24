@@ -9,7 +9,6 @@
 *.so
 *.dylib
 receiver-service
-
 # Test binary, built with `go test -c`
 *.test
 
@@ -27,6 +26,7 @@ go.work
 .DS_Store
 .AppleDouble
 .LSOverride
+.idea
 
 # Icon must end with two \r
 Icon
