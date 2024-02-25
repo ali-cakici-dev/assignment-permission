@@ -63,3 +63,18 @@ In this task, you are required to fill in the empty functions with appropriate n
 
 NOTE: In the event of a permission conflict, precedence shall be given to the higher permission level for resolution.
 </details>
+
+
+How to run:
+```bash
+make up
+```
+
+Endpoints:
+
+| /all-permissions                     | GET  | Retrieves all stored permissions                            |
+|--------------------------------------|------|-------------------------------------------------------------|
+| /permissions                         | POST | Creates a new permission entry                              |
+| /add-role                            | POST | Creates a new role                                          |
+| /fetch-permitted-resources/{user_id} | GET  | Fetches the list of resources a user is permitted to access |
+| /get-role/{group_id}/{user_id}       | GET  | Gets the role of a user for a specific resource             |
