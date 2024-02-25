@@ -10,8 +10,8 @@ type persistence interface {
 }
 
 type rolePersistence interface {
-	InsertRole(ctx context.Context, prd *role) error
-	InsertPermission(ctx context.Context, prd *permission) error
+	insertRole(ctx context.Context, r *role) error
+	insertPermission(ctx context.Context, prd *permission) error
 	getAllPermissions(ctx context.Context) (permissions, error)
 	getPermissionByUserID(ctx context.Context, userID string) (permissions, error)
 	getRoleIDByUserIDGroupID(ctx context.Context, userID string, groupID string) (string, error)
@@ -31,11 +31,15 @@ type Service interface {
 }
 
 func (svc *service) InsertRole(ctx context.Context) error {
+	err := svc.store.insertRole(ctx, nil)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (svc *service) InsertPermission(ctx context.Context, prm *permission) error {
-	err := svc.store.InsertPermission(ctx, prm)
+	err := svc.store.insertPermission(ctx, prm)
 	if err != nil {
 		return err
 	}

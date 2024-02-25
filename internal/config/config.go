@@ -7,9 +7,14 @@ import (
 )
 
 type Config struct {
-	DatabaseURI string `env:"DATABASE_URI" envDefault:"mongodb://localhost:27017"`
+	DatabaseURI string `env:"DATABASE_URI" envDefault:"mongodb://mongodb:27017"`
 	Port        int    `env:"PORT" envDefault:"8080"`
-	Host        string `env:"HOST" envDefault:"localhost"`
+	Host        string `env:"HOST" envDefault:"0.0.0.0"`
+
+	MongoConfig struct {
+		PermissionCollection string `env:"PERMISSION_COLLECTION" envDefault:"permissions"`
+		RoleCollection       string `env:"ROLE_COLLECTION" envDefault:"roles"`
+	}
 }
 
 func LoadConfig(path, filename string) (*Config, error) {

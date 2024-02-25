@@ -9,6 +9,22 @@ type Role struct {
 	Action      []string `json:"action"`
 }
 
+func (r *Role) Validate() error {
+	if r == nil {
+		return errors.New("role is required")
+	}
+	if r.Name == "" {
+		return errors.New("name is required")
+	}
+	if r.Description == "" {
+		return errors.New("description is required")
+	}
+	if len(r.Action) == 0 {
+		return errors.New("action is required")
+	}
+	return nil
+}
+
 type Permissions []Permission
 type Permission struct {
 	Resource string           `json:"resource"`
@@ -17,6 +33,9 @@ type Permission struct {
 }
 
 func (p *Permission) Validate() error {
+	if p == nil {
+		return errors.New("permission is required")
+	}
 	if p.Resource == "" {
 		return errors.New("resource is required")
 	}

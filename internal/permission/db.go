@@ -8,6 +8,7 @@ import (
 
 type MongoConfig struct {
 	PermissionCollection string
+	RoleCollection       string
 }
 
 type PermissionDB struct {
@@ -15,13 +16,18 @@ type PermissionDB struct {
 	cfg *MongoConfig
 }
 
-func (db *PermissionDB) InsertRole(ctx context.Context, prd *role) error {
+func (db *PermissionDB) insertPermission(ctx context.Context, prd *permission) error {
+	permissionCollection := db.cli.DB.Collection(db.cfg.PermissionCollection)
+	_, err := permissionCollection.InsertOne(ctx, prd)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (db *PermissionDB) InsertPermission(ctx context.Context, prd *permission) error {
-	permissionCollection := db.cli.DB.Collection(db.cfg.PermissionCollection)
-	_, err := permissionCollection.InsertOne(ctx, prd)
+func (db *PermissionDB) insertRole(ctx context.Context, r *role) error {
+	permissionCollection := db.cli.DB.Collection(db.cfg.RoleCollection)
+	_, err := permissionCollection.InsertOne(ctx, r)
 	if err != nil {
 		return err
 	}
@@ -105,7 +111,7 @@ func (db *PermissionDB) getRoleIDByUserIDGroupID(ctx context.Context, userID str
 }
 
 func (db *PermissionDB) getRoleByID(ctx context.Context, roleID string) (*role, error) {
-	rolesCollection := db.cli.DB.Collection(db.cfg.PermissionCollection)
+	rolesCollection := db.cli.DB.Collection(db.cfg.RoleCollection)
 	res := rolesCollection.FindOne(
 		ctx,
 		bson.M{"_id": roleID},
@@ -130,8 +136,3 @@ func InitDB(cli *pkg.MongoInstance, cfg *MongoConfig) (*PermissionDB, error) {
 		cfg: cfg,
 	}, nil
 }
-
-//func fetchDocument(res *document, collection string) (err error) {
-//
-//	return
-//}
